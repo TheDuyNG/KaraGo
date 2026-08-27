@@ -1,58 +1,13 @@
-import React from 'react'
-import { Card, Row, Col, Button } from 'antd'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import Icon from '../../components/ui/Icon'
+import { galleryImages } from '../../data/catalog'
 
-const AboutPage = () => {
+export default function AboutPage() {
   const { t } = useTranslation()
-  return (
-    <div className='px-8 py-12'>
-      <div className='max-w-5xl mx-auto'>
-        <div className='mb-8'>
-          <h1 className='text-4xl font-bold'>{t('about.title')}</h1>
-          <p className='text-gray-600 mt-3 text-lg'>{t('about.subtitle')}</p>
-        </div>
-
-        <Row gutter={[24, 24]}>
-          <Col xs={24} md={12}>
-            <Card bordered={false} className='shadow-sm'>
-              <h3 className='text-2xl font-semibold mb-2'>{t('about.missionTitle')}</h3>
-              <p className='text-gray-700'>{t('about.missionText')}</p>
-              <ul className='list-disc list-inside mt-4 text-gray-700'>
-                <li>Curated venue selection</li>
-                <li>Instant confirmations</li>
-                <li>Secure payments and transparent pricing</li>
-              </ul>
-            </Card>
-          </Col>
-
-          <Col xs={24} md={12}>
-            <Card bordered={false} className='shadow-sm'>
-              <h3 className='text-2xl font-semibold mb-2'>{t('about.valuesTitle')}</h3>
-              <p className='text-gray-700'>{t('about.valuesText')}</p>
-              <div className='mt-6'>
-                <Button type='primary' onClick={() => window.location.href = '/booking'}>{t('about.ctaBook')}</Button>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        <div className='mt-8 grid grid-cols-1 md:grid-cols-3 gap-6'>
-          <Card className='text-center shadow-sm'>
-            <h4 className='text-xl font-semibold'>Support</h4>
-            <p className='text-gray-600 mt-2'>support@example.com</p>
-          </Card>
-          <Card className='text-center shadow-sm'>
-            <h4 className='text-xl font-semibold'>Partnerships</h4>
-            <p className='text-gray-600 mt-2'>partner@example.com</p>
-          </Card>
-          <Card className='text-center shadow-sm'>
-            <h4 className='text-xl font-semibold'>Careers</h4>
-            <p className='text-gray-600 mt-2'>Join our mission — careers@example.com</p>
-          </Card>
-        </div>
-      </div>
-    </div>
-  )
+  return <main>
+    <section className="page-hero"><div className="shell"><span className="eyebrow light">{t('about.eyebrow')}</span><h1>{t('about.title')}</h1><p>{t('about.subtitle')}</p></div></section>
+    <section className="section shell story-grid"><div><span className="eyebrow">{t('about.storyEyebrow')}</span><h2>{t('about.storyTitle')}</h2><p>{t('about.storyOne')}</p><p>{t('about.storyTwo')}</p><Link className="button button-dark" to="/booking">{t('nav.bookNow')} <Icon name="arrow" size={17} /></Link></div><div className="story-images"><img src={galleryImages[1]} alt="Private room" /><img src={galleryImages[2]} alt="Live performance" /></div></section>
+    <section className="values-section"><div className="shell"><div className="section-heading centered"><span className="eyebrow">{t('about.valuesEyebrow')}</span><h2>{t('about.valuesTitle')}</h2></div><div className="value-grid"><article><span>01</span><h3>{t('about.valueOneTitle')}</h3><p>{t('about.valueOneText')}</p></article><article><span>02</span><h3>{t('about.valueTwoTitle')}</h3><p>{t('about.valueTwoText')}</p></article><article><span>03</span><h3>{t('about.valueThreeTitle')}</h3><p>{t('about.valueThreeText')}</p></article></div></div></section>
+  </main>
 }
-
-export default AboutPage

@@ -4,7 +4,17 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>booking-nhanh</title>
+    <meta name="description" content="Book premium private karaoke rooms in Ho Chi Minh City with Booking Nhanh." />
+    <meta name="theme-color" content="#182a24" />
+    <title>Booking Nhanh — Private Karaoke Rooms</title>
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('bookingNhanh.theme')
+        const initialTheme = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        document.documentElement.dataset.theme = initialTheme
+        document.documentElement.style.colorScheme = initialTheme
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

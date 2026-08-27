@@ -1,34 +1,34 @@
-import './App.css'
-import Footer from './components/footer/Footer'
-import Navbar from './components/navbar/Navbar'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './context/AuthProvider'
+import { ThemeProvider } from './context/ThemeProvider'
+import Layout from './components/layout/Layout'
+import ProtectedRoute from './auth/ProtectedRoute'
 import HomePage from './pages/home/HomePage'
+import RoomsPage from './pages/RoomsPage'
 import BookingPage from './pages/booking/BookingPage'
 import AboutPage from './pages/about/AboutPage'
-import ServicesPage from './pages/services/ServicesPage'
+import ContactPage from './pages/ContactPage'
 import Login from './pages/Login'
-import AdminPage from './pages/admin/AdminPage'
-import ProtectedRoute from './auth/ProtectedRoute'
 import Register from './pages/Register'
+import AccountPage from './pages/AccountPage'
+import AdminPage from './pages/admin/AdminPage'
+import NotFoundPage from './pages/NotFoundPage'
 import './i18n'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import './App.css'
 
-function App() {
-  return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/services' element={<ServicesPage />} />
-        <Route path='/about' element={<AboutPage />} />
-        <Route path='/booking' element={<BookingPage />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/admin/login' element={<Navigate to="/login" replace />} />
-        <Route path='/admin' element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-      </Routes>
-      {/* <Footer /> */}
-    </Router>
-  )
+export default function App() {
+  return <ThemeProvider><BrowserRouter><AuthProvider><Routes>
+    <Route element={<Layout />}>
+      <Route index element={<HomePage />} />
+      <Route path="rooms" element={<RoomsPage />} />
+      <Route path="booking" element={<BookingPage />} />
+      <Route path="about" element={<AboutPage />} />
+      <Route path="contact" element={<ContactPage />} />
+      <Route path="account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+    </Route>
+    <Route path="login" element={<Login />} />
+    <Route path="register" element={<Register />} />
+    <Route path="admin" element={<ProtectedRoute adminOnly><AdminPage /></ProtectedRoute>} />
+    <Route path="*" element={<NotFoundPage />} />
+  </Routes></AuthProvider></BrowserRouter></ThemeProvider>
 }
-
-export default App

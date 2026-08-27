@@ -1,248 +1,196 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Modal, Input, DatePicker, notification, Card, Tag, Row, Col, Space, Select, InputNumber } from 'antd'
-import dayjs from 'dayjs'
+import { useMemo, useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { createBooking, fetchBookings } from '../../services/bookingsApi'
+import { rooms, timeSlots } from '../../data/catalog'
+import { createBooking, getBookings, getRoomStatus } from '../../services/localStore'
+import { useAuth } from '../../context/useAuth'
+import Icon from '../../components/ui/Icon'
 
-const initialTables = Array.from({ length: 8 }).map((_, i) => ({
-  id: i + 1,
-  name: `Table ${i + 1}`,
-  capacity: 4 + (i % 2) * 2,
-  booked: false,
-  bookedAt: null,
-  note: i % 3 === 0 ? 'Popular choice' : null,
-  image: null,
-  // example price in VND
-  price: 300000 + i * 50000,
-}))
+function toLocalDateString(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
-const BookingPage = () => {
-  const { t } = useTranslation()
-  const [tables, setTables] = useState(initialTables)
-  const [myBookings, setMyBookings] = useState([])
-  const [selected, setSelected] = useState(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [guestName, setGuestName] = useState('')
-  const [people, setPeople] = useState(2)
-  const [dateTime, setDateTime] = useState(dayjs().toISOString())
-  const [paymentType, setPaymentType] = useState('full') // 'full' | 'deposit'
-  const [depositPercent, setDepositPercent] = useState(30)
-  const [paymentMethod, setPaymentMethod] = useState('card')
-  const [loading, setLoading] = useState(false)
-  const [pendingService, setPendingService] = useState(null)
+const today = toLocalDateString(new Date())
 
-  const bookedTableNumbers = useMemo(
-    () => new Set(myBookings.filter((b) => b.status !== 'cancelled').map((b) => Number(b.tableNumber))),
-    [myBookings]
-  )
+export default function BookingPage() {
+  const { t, i18n } = useTranslation()
+  const { user } = useAuth()
+  const [searchParams] = useSearchParams()
+  const requestedRoom = searchParams.get('room')
+  const availableRooms = rooms.filter((room) => getRoomStatus()[room.id] !== false)
+  const [step, setStep] = useState(1)
+  const [error, setError] = useState('')
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [completedBooking, setCompletedBooking] = useState(null)
+  const [form, setForm] = useState({
+    roomId: availableRooms.some((room) => room.id === requestedRoom) ? requestedRoom : availableRooms[0]?.id || '',
+    date: today,
+    time: '',
+    duration: 2,
+    guests: 4,
+    customerName: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    note: '',
+  })
 
-  const displayTables = useMemo(
-    () => tables.map((table) => ({
-      ...table,
-      booked: bookedTableNumbers.has(Number(table.id)),
-    })),
-    [tables, bookedTableNumbers]
-  )
+  const selectedRoom = rooms.find((room) => room.id === form.roomId)
+  const total = (selectedRoom?.price || 0) * Number(form.duration)
+  const formatter = useMemo(() => new Intl.NumberFormat(i18n.resolvedLanguage === 'vi' ? 'vi-VN' : 'en-US'), [i18n.resolvedLanguage])
 
-  const refreshBookings = async () => {
-    const token = localStorage.getItem('token')
-    if (!token) return
-    try {
-      const data = await fetchBookings()
-      setMyBookings(data.items || [])
-    } catch (e) {
-      // keep page usable even if booking list fails
-      notification.error({ message: e.message || 'Failed to load bookings' })
-    }
+  const isSlotUnavailable = (roomId, date, time) => {
+    const isPastTime = date === today && time <= new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+    const isBooked = getBookings().some((booking) => booking.roomId === roomId && booking.date === date && booking.time === time && booking.status !== 'cancelled')
+    return isPastTime || isBooked
   }
 
-  useEffect(() => {
-    refreshBookings()
-  }, [])
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('pendingBooking')
-      if (!raw) return
-      const p = JSON.parse(raw)
-      setPendingService(p)
-      const nextTable = displayTables.find((table) => !table.booked) || displayTables[0]
-      if (nextTable) {
-        setSelected(nextTable)
-        setGuestName('')
-        setPeople(2)
-        setDateTime(dayjs().toISOString())
-        setIsModalOpen(true)
-      }
-      localStorage.removeItem('pendingBooking')
-    } catch (e) {
-      // ignore
+  const update = (field, value) => {
+    setError('')
+    setForm((current) => ({ ...current, [field]: value }))
+  }
+  const selectRoom = (roomId) => {
+    setError('')
+    setForm((current) => ({ ...current, roomId, time: isSlotUnavailable(roomId, current.date, current.time) ? '' : current.time }))
+  }
+  const selectDate = (date) => {
+    setError('')
+    setForm((current) => ({ ...current, date, time: isSlotUnavailable(current.roomId, date, current.time) ? '' : current.time }))
+  }
+  const nextStep = () => {
+    setError('')
+    if (step === 1 && (!form.roomId || !form.date || !form.time)) return setError(t('booking.selectScheduleError'))
+    if (step === 1 && isSlotUnavailable(form.roomId, form.date, form.time)) return setError(t('booking.slotUnavailable'))
+    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)
+    const phoneIsValid = form.phone.replace(/\D/g, '').length >= 9
+    if (step === 2 && (!form.customerName.trim() || !emailIsValid || !phoneIsValid || Number(form.guests) < 1 || Number(form.guests) > selectedRoom.capacity)) return setError(t('booking.contactError'))
+    setStep((current) => Math.min(current + 1, 3))
+  }
+  const submit = () => {
+    setError('')
+    if (!acceptedTerms) return setError(t('booking.acceptTermsError'))
+    if (isSlotUnavailable(form.roomId, form.date, form.time)) {
+      setStep(1)
+      setForm((current) => ({ ...current, time: '' }))
+      return setError(t('booking.slotUnavailable'))
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayTables])
-
-  const openBooking = (table) => {
-    setSelected(table)
-    setGuestName('')
-    setPeople(2)
-    setDateTime(dayjs().toISOString())
-    setIsModalOpen(true)
+    const booking = createBooking({ ...form, duration: Number(form.duration), guests: Number(form.guests), total })
+    setCompletedBooking(booking)
+    setStep(4)
   }
 
-  const handleConfirm = async () => {
-    if (!dateTime || !guestName || !selected) {
-      notification.error({ message: t('booking.errorFill') })
-      return
-    }
-
-    setLoading(true)
-    try {
-      const payload = {
-        tableNumber: Number(selected.id),
-        guests: people,
-        time: dateTime,
-      }
-      const data = await createBooking(payload)
-      const created = data.booking
-      await refreshBookings()
-      setIsModalOpen(false)
-      notification.success({
-        message: t('booking.successMessage'),
-        description: t('booking.successDescription', { table: selected?.name, guest: guestName, date: new Date(created.time).toLocaleString() }),
-      })
-      if (pendingService) {
-        notification.info({
-          message: 'Service booking note',
-          description: `${pendingService.venueName || ''}${pendingService.serviceName ? ` - ${pendingService.serviceName}` : ''}`,
-        })
-      }
-    } catch (e) {
-      notification.error({ message: e.message || 'Booking failed' })
-    } finally {
-      setLoading(false)
-    }
+  if (step === 4) {
+    return (
+      <main className="booking-page">
+        <section className="shell booking-success" aria-live="polite">
+          <span className="success-icon"><Icon name="check" size={34} /></span>
+          <span className="eyebrow">{t('booking.confirmedEyebrow')}</span>
+          <h1>{t('booking.thankYou', { name: completedBooking.customerName.split(' ')[0] })}</h1>
+          <p>{t('booking.successText')}</p>
+          <div className="confirmation-card">
+            <div><small>{t('booking.reference')}</small><strong>{completedBooking.id}</strong></div>
+            <div><small>{t('booking.room')}</small><strong>{t(selectedRoom.nameKey)}</strong></div>
+            <div><small>{t('booking.dateTime')}</small><strong>{completedBooking.date} · {completedBooking.time}</strong></div>
+            <div><small>{t('booking.total')}</small><strong>{formatter.format(completedBooking.total)}₫</strong></div>
+          </div>
+          <div className="success-actions">
+            <Link className="button button-dark" to={user ? '/account' : '/'}>{user ? t('nav.myBookings') : t('nav.home')}</Link>
+            <Link className="button button-secondary" to="/rooms">{t('rooms.viewRooms')}</Link>
+          </div>
+        </section>
+      </main>
+    )
   }
 
   return (
-    <div className='px-8 py-10'>
-      <div className='max-w-6xl mx-auto'>
-        <div className='bg-white rounded-lg shadow-sm p-8 mb-8'>
-          <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
-            <div>
-              <h1 className='text-3xl font-bold'>{t('booking.title')}</h1>
-              <p className='text-gray-600 mt-2'>{t('booking.subtitle')}</p>
+    <main className="booking-page">
+      <section className="booking-heading shell">
+        <span className="eyebrow">{t('booking.eyebrow')}</span>
+        <h1>{t('booking.title')}</h1>
+        <p>{t('booking.subtitle')}</p>
+        <div className="stepper" aria-label={t('booking.progress')}>
+          {[1, 2, 3].map((number) => (
+            <button className={step >= number ? 'active' : ''} key={number} type="button" disabled={number > step} onClick={() => number < step && setStep(number)} aria-current={step === number ? 'step' : undefined}>
+              <span>{step > number ? <Icon name="check" size={15} /> : number}</span>
+              <small>{t(`booking.step${number}`)}</small>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="shell booking-layout">
+        <div className="booking-form card-panel">
+          {step === 1 && (
+            <div className="form-step">
+              <div className="form-title"><span>01</span><div><h2>{t('booking.chooseRoomAndTime')}</h2><p>{t('booking.chooseRoomHelp')}</p></div></div>
+              <div className="room-options">
+                {availableRooms.map((room) => (
+                  <button type="button" aria-pressed={form.roomId === room.id} className={form.roomId === room.id ? 'selected' : ''} key={room.id} onClick={() => selectRoom(room.id)}>
+                    <img src={room.image} alt="" />
+                    <span><strong>{t(room.nameKey)}</strong><small><Icon name="people" size={14} /> {t('rooms.upTo', { count: room.capacity })}</small></span>
+                    <b>{formatter.format(room.price)}₫<small>/{t('common.hour')}</small></b>
+                  </button>
+                ))}
+              </div>
+              <div className="form-grid schedule-grid">
+                <label>{t('booking.date')}<input type="date" min={today} value={form.date} onChange={(event) => selectDate(event.target.value)} /></label>
+                <label>{t('booking.duration')}<select value={form.duration} onChange={(event) => update('duration', event.target.value)}><option value="2">2 {t('common.hours')}</option><option value="3">3 {t('common.hours')}</option><option value="4">4 {t('common.hours')}</option></select></label>
+              </div>
+              <fieldset className="time-field">
+                <legend>{t('booking.startTime')}</legend>
+                <div className="time-options">
+                  {timeSlots.map((time) => {
+                    const unavailable = isSlotUnavailable(form.roomId, form.date, time)
+                    return <button className={form.time === time ? 'selected' : ''} type="button" key={time} disabled={unavailable} onClick={() => update('time', time)} aria-pressed={form.time === time}><strong>{time}</strong>{unavailable && <small>{t('booking.unavailable')}</small>}</button>
+                  })}
+                </div>
+              </fieldset>
             </div>
-            <div>
-              <Space>
-                <Button type='primary' size='large' onClick={() => window.scrollTo({ top: 400, behavior: 'smooth' })}>{t('booking.bookNow')}</Button>
-                <Button onClick={() => { refreshBookings(); notification.info({ message: t('booking.reset'), description: '' }) }}>{t('booking.reset')}</Button>
-              </Space>
+          )}
+
+          {step === 2 && (
+            <div className="form-step">
+              <div className="form-title"><span>02</span><div><h2>{t('booking.yourDetails')}</h2><p>{t('booking.detailsHelp')}</p></div></div>
+              <div className="form-grid">
+                <label>{t('form.fullName')}<input required value={form.customerName} onChange={(event) => update('customerName', event.target.value)} autoComplete="name" /></label>
+                <label>{t('form.email')}<input required type="email" value={form.email} onChange={(event) => update('email', event.target.value)} autoComplete="email" /></label>
+                <label>{t('form.phone')}<input required inputMode="tel" value={form.phone} onChange={(event) => update('phone', event.target.value)} autoComplete="tel" /></label>
+                <label>{t('booking.guests')}<input required min="1" max={selectedRoom?.capacity} type="number" value={form.guests} onChange={(event) => update('guests', event.target.value)} /><small className="field-hint">{t('booking.capacityHint', { count: selectedRoom?.capacity })}</small></label>
+              </div>
+              <label>{t('booking.specialRequest')}<textarea rows="4" value={form.note} onChange={(event) => update('note', event.target.value)} placeholder={t('booking.requestPlaceholder')} /></label>
             </div>
+          )}
+
+          {step === 3 && (
+            <div className="form-step">
+              <div className="form-title"><span>03</span><div><h2>{t('booking.reviewBooking')}</h2><p>{t('booking.reviewHelp')}</p></div></div>
+              <div className="review-list">
+                <div><span>{t('booking.room')}</span><strong>{t(selectedRoom.nameKey)}</strong></div>
+                <div><span>{t('booking.dateTime')}</span><strong>{form.date} · {form.time}</strong></div>
+                <div><span>{t('booking.duration')}</span><strong>{form.duration} {t('common.hours')}</strong></div>
+                <div><span>{t('booking.guests')}</span><strong>{form.guests}</strong></div>
+                <div><span>{t('form.fullName')}</span><strong>{form.customerName}</strong></div>
+                <div><span>{t('form.contact')}</span><strong>{form.phone}<br />{form.email}</strong></div>
+                {form.note && <div><span>{t('booking.specialRequest')}</span><strong>{form.note}</strong></div>}
+              </div>
+              <label className="checkbox-label"><input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} /><span>{t('booking.terms')}</span></label>
+            </div>
+          )}
+
+          {error && <div className="error-banner" role="alert">{error}</div>}
+          <div className="form-actions">
+            {step > 1 && <button className="button button-secondary" type="button" onClick={() => { setError(''); setStep((current) => current - 1) }}>{t('common.back')}</button>}
+            <button className="button button-primary" type="button" onClick={step === 3 ? submit : nextStep}>{step === 3 ? t('booking.confirmBooking') : t('common.continue')} <Icon name="arrow" size={17} /></button>
           </div>
         </div>
 
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={16}>
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-              {displayTables.map((table) => (
-                <Card key={table.id} bordered={false} className='shadow-sm' bodyStyle={{ padding: 12 }}>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <h3 className='text-lg font-semibold'>{table.name}</h3>
-                      <div className='text-sm text-gray-500'>Capacity: {table.capacity}</div>
-                      {table.note && <div className='text-xs text-amber-600 mt-1'>{table.note}</div>}
-                    </div>
-                    <div className='text-right'>
-                        <div className='text-right'>
-                          <div className='text-sm text-gray-700'>Price: {(table.price || 0).toLocaleString()} VND</div>
-                          <Tag color={table.booked ? 'red' : 'green'}>{table.booked ? 'Booked' : 'Available'}</Tag>
-                        </div>
-                      <div className='mt-3'>
-                        <Button type='primary' disabled={table.booked} onClick={() => openBooking(table)}>Reserve</Button>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </Col>
-
-          <Col xs={24} md={8}>
-            <Card title={t('booking.howToTitle')} bordered={false} className='shadow-sm'>
-              <ol className='list-decimal list-inside text-sm text-gray-700 space-y-2'>
-                <li>{t('booking.howTo1')}</li>
-                <li>{t('booking.howTo2')}</li>
-                <li>{t('booking.howTo3')}</li>
-                <li>{t('booking.howTo4')}</li>
-              </ol>
-
-              <div className='mt-4'>
-                <h4 className='font-medium'>{t('booking.notificationsTitle')}</h4>
-                <p className='text-sm text-gray-600'>We show success/error toasts on actions. Integrate email/SMS on server for production.</p>
-              </div>
-            </Card>
-          </Col>
-        </Row>
-
-        <Modal
-          title={selected ? t('booking.modalTitle', { table: selected?.name }) : t('booking.modalTitle', { table: '' })}
-          open={isModalOpen}
-          onOk={handleConfirm}
-          onCancel={() => setIsModalOpen(false)}
-          okText={t('booking.modalConfirm')}
-          confirmLoading={loading}
-        >
-          <div className='space-y-3'>
-            {pendingService && (
-              <div className='rounded-md bg-blue-50 text-blue-700 px-3 py-2 text-sm'>
-                Pending service: {pendingService.venueName}{pendingService.serviceName ? ` - ${pendingService.serviceName}` : ''}
-              </div>
-            )}
-            <Input placeholder={t('booking.modalNamePlaceholder')} value={guestName} onChange={(e) => setGuestName(e.target.value)} />
-            <Input type='number' min={1} max={12} value={people} onChange={(e) => setPeople(Number(e.target.value))} />
-            <DatePicker
-              showTime
-              style={{ width: '100%' }}
-              value={dateTime ? dayjs(dateTime) : null}
-              onChange={(val) => setDateTime(val ? val.toDate().toISOString() : dayjs().toISOString())}
-            />
-
-            <div>
-              <div className='mb-2 font-medium'>Payment</div>
-              <Space direction='vertical' style={{ width: '100%' }}>
-                <Select value={paymentType} onChange={(v) => setPaymentType(v)}>
-                  <Select.Option value='full'>Full payment</Select.Option>
-                  <Select.Option value='deposit'>Deposit</Select.Option>
-                </Select>
-
-                {paymentType === 'deposit' && (
-                  <div className='flex items-center gap-2'>
-                    <div>Deposit %</div>
-                    <InputNumber min={10} max={100} value={depositPercent} onChange={(v) => setDepositPercent(v)} />
-                  </div>
-                )}
-
-                <Select value={paymentMethod} onChange={(v) => setPaymentMethod(v)}>
-                  <Select.Option value='card'>Credit/Debit Card</Select.Option>
-                  <Select.Option value='paypal'>PayPal</Select.Option>
-                  <Select.Option value='cash'>Cash on arrival</Select.Option>
-                  <Select.Option value='bank'>Bank transfer</Select.Option>
-                </Select>
-
-                <div className='pt-2'>
-                  <div className='text-sm text-gray-700'>Amount to pay: <strong>{(() => {
-                    const price = selected?.price || 0
-                    const amount = paymentType === 'full' ? price : Math.round((price * depositPercent) / 100)
-                    return `${amount.toLocaleString()} VND`
-                  })()}</strong></div>
-                </div>
-              </Space>
-            </div>
-          </div>
-        </Modal>
-      </div>
-    </div>
+        <aside className="booking-summary">
+          <img src={selectedRoom?.image} alt={selectedRoom ? t(selectedRoom.nameKey) : ''} />
+          <div><span className="eyebrow">{t('booking.yourSelection')}</span><h2>{selectedRoom ? t(selectedRoom.nameKey) : t('booking.chooseRoom')}</h2><p>{selectedRoom ? t(selectedRoom.descriptionKey) : ''}</p><div className="summary-line"><span>{t('booking.roomRate')}</span><strong>{formatter.format(selectedRoom?.price || 0)}₫</strong></div><div className="summary-line"><span>{t('booking.duration')}</span><strong>× {form.duration}</strong></div><div className="summary-total"><span>{t('booking.estimatedTotal')}</span><strong>{formatter.format(total)}₫</strong></div><small className="summary-note"><Icon name="shield" size={15} /> {t('booking.paymentNote')}</small></div>
+        </aside>
+      </section>
+    </main>
   )
 }
-
-export default BookingPage
