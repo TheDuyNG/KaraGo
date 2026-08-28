@@ -1,8 +1,0 @@
-.carousel {
-    animation: spin 5s infinite linear;
-}
-
-@keyframes spin {
-    from {transform: 0;}
-    to {transform: -100%;}
-}

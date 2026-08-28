@@ -1,48 +1,18 @@
 {
-  "nav": {
-    "home": "Trang chủ",
-    "about": "Về chúng tôi",
-    "booking": "Đặt bàn",
-    "services": "Dịch vụ",
-    "contact": "Liên hệ",
-    "login": "Đăng nhập",
-    "register": "Đăng ký",
-    "logout": "Đăng xuất",
-    "searchPlaceholder": "Tìm kiếm...",
-    "langEn": "EN",
-    "langVi": "VI"
+  "common": {
+    "appName": "KaraGo", "home": "Trang chủ", "explore": "Khám phá", "about": "Về KaraGo", "myBookings": "Lịch đặt", "login": "Đăng nhập", "register": "Đăng ký", "logout": "Đăng xuất", "bookNow": "Đặt phòng", "viewRoom": "Xem phòng", "back": "Quay lại", "continue": "Tiếp tục", "confirm": "Xác nhận", "cancel": "Hủy", "close": "Đóng", "retry": "Thử lại", "from": "Từ", "perHour": "/ giờ", "guests": "khách", "hours": "giờ", "reviews": "đánh giá", "available": "Còn trống", "popular": "Được yêu thích", "loading": "Đang chuẩn bị trải nghiệm...", "noResults": "Chưa tìm thấy kết quả phù hợp", "optional": "Không bắt buộc"
   },
-  "about": {
-    "title": "Về chúng tôi",
-    "subtitle": "Chúng tôi kết nối bạn với các địa điểm KTV tốt nhất — đặt chỗ nhanh, đáng tin cậy và ưu đãi hấp dẫn.",
-    "missionTitle": "Sứ mệnh",
-    "missionText": "Giúp việc đặt chỗ cho buổi tối trở nên dễ dàng. Chúng tôi hợp tác với các địa điểm KTV đã được xác minh để mang tới trải nghiệm chọn lọc và khuyến mãi độc quyền.",
-    "valuesTitle": "Giá trị",
-    "valuesText": "Luôn đặt khách hàng lên hàng đầu, hợp tác đáng tin cậy và cải tiến liên tục.",
-    "ctaBook": "Đặt bàn"
+  "navigation": { "menu": "Mở menu", "closeMenu": "Đóng menu", "switchToLight": "Chuyển sang giao diện sáng", "switchToDark": "Chuyển sang giao diện tối", "language": "Ngôn ngữ", "theme": "Giao diện" },
+  "home": {
+    "eyebrow": "Karaoke chọn lọc tại Sài Gòn", "title": "Một căn phòng.\nCả đêm thuộc về bạn.", "subtitle": "Khám phá những phòng karaoke đẹp, chọn giờ trống và đặt ngay trong vài phút — giá rõ ràng, xác nhận tức thì.", "primaryCta": "Tìm phòng phù hợp", "secondaryCta": "Xem cách hoạt động", "searchLocation": "Khu vực", "searchLocationValue": "TP. Hồ Chí Minh", "searchDate": "Ngày đi hát", "searchGuests": "Số khách", "searchAction": "Tìm phòng", "featuredEyebrow": "Tuyển chọn cho bạn", "featuredTitle": "Những căn phòng đáng để hát thêm một bài", "featuredSubtitle": "Từ buổi hẹn thân mật đến sinh nhật thật lớn, luôn có một không gian đúng nhịp.", "viewAll": "Xem tất cả phòng", "howEyebrow": "Nhanh và rõ ràng", "howTitle": "Từ ý tưởng đến đêm vui chỉ trong ba bước", "step1Title": "Chọn không gian", "step1Text": "Lọc theo khu vực, số người và phong cách của buổi gặp.", "step2Title": "Chọn khung giờ", "step2Text": "Xem thời gian còn trống và giá cuối cùng trước khi đặt.", "step3Title": "Nhận xác nhận", "step3Text": "Thông tin phòng và mã đặt chỗ được lưu ngay trong tài khoản.", "promiseTitle": "Mỗi buổi hát, một trải nghiệm đáng nhớ.", "promiseText": "Địa điểm được chọn lọc, giá minh bạch và hỗ trợ khi bạn cần.", "promiseCta": "Khám phá KaraGo"
   },
-  "booking": {
-    "title": "Đặt bàn",
-    "subtitle": "Đặt nhanh, xác nhận ngay. Chọn bàn còn trống bên dưới.",
-    "bookNow": "Đặt ngay",
-    "reset": "Đặt lại",
-    "howToTitle": "Cách đặt",
-    "howTo1": "Chọn bàn còn trống và nhấn Reserve.",
-    "howTo2": "Nhập tên, số lượng khách và chọn ngày/giờ.",
-    "howTo3": "Xác nhận đặt chỗ — bạn sẽ thấy thông báo.",
-    "howTo4": "Đặt chỗ được lưu cục bộ (demo).",
-    "notificationsTitle": "Thông báo",
-    "modalTitle": "Đặt {{table}}",
-    "modalNamePlaceholder": "Tên của bạn",
-    "modalPeoplePlaceholder": "Số người",
-    "modalConfirm": "Xác nhận đặt",
-    "paymentTitle": "Thanh toán",
-    "paymentFull": "Thanh toán toàn phần",
-    "paymentDeposit": "Đặt cọc",
-    "paymentMethods": "Phương thức thanh toán",
-    "depositPercent": "Phần trăm đặt cọc",
-    "successMessage": "Đặt chỗ thành công",
-    "successDescription": "{{table}} đã được đặt cho {{guest}} vào {{date}}",
-    "errorFill": "Vui lòng điền tên và ngày/giờ"
-  }
+  "explore": { "eyebrow": "Phòng karaoke", "title": "Tìm căn phòng đúng nhịp", "subtitle": "Không gian riêng tư, âm thanh chất lượng và mức giá rõ ràng.", "searchLabel": "Tìm theo tên phòng hoặc địa điểm", "searchPlaceholder": "Ví dụ: Quận 1, Velvet...", "guestLabel": "Sức chứa", "allGuests": "Mọi nhóm", "smallGroup": "Tối đa 8 khách", "mediumGroup": "9–14 khách", "largeGroup": "Từ 15 khách", "resultCount": "{{count}} phòng đang chờ bạn", "emptyTitle": "Chưa có phòng phù hợp", "emptyText": "Hãy thử từ khóa khác hoặc thay đổi số khách." },
+  "room": { "capacity": "Tối đa {{count}} khách", "size": "{{count}} m²", "minimum": "Tối thiểu {{count}} giờ", "about": "Về căn phòng", "amenities": "Tiện nghi có sẵn", "location": "Địa điểm", "selectDate": "Chọn ngày", "selectTime": "Chọn giờ còn trống", "selectDuration": "Thời lượng", "summary": "Tóm tắt", "estimatedTotal": "Tạm tính", "availabilityError": "Không thể tải giờ trống. Vui lòng thử lại.", "notFound": "Không tìm thấy căn phòng này.", "amenity": { "dolby": "Âm thanh Dolby", "wirelessMics": "Micro không dây", "songLibrary": "Kho bài hát mới", "welcomeDrinks": "Nước chào mừng", "ambientLights": "Ánh sáng tùy chỉnh", "miniBar": "Mini bar", "stage": "Sân khấu riêng", "eventHost": "Hỗ trợ sự kiện" } },
+  "booking": { "eyebrow": "Hoàn tất đặt phòng", "title": "Thông tin buổi hát", "subtitle": "Kiểm tra thời gian và cho chúng tôi biết cách liên hệ với bạn.", "customerName": "Họ và tên", "customerNamePlaceholder": "Nguyễn Minh Anh", "customerPhone": "Số điện thoại", "customerPhonePlaceholder": "090 123 4567", "guestCount": "Số khách", "specialRequests": "Yêu cầu thêm", "specialRequestsPlaceholder": "Sinh nhật, trang trí, dị ứng thực phẩm...", "details": "Chi tiết đặt phòng", "date": "Ngày", "time": "Giờ bắt đầu", "duration": "Thời lượng", "roomPrice": "Tiền phòng", "serviceFee": "Phí dịch vụ", "serviceFeeValue": "Miễn phí", "total": "Tổng cộng", "submit": "Xác nhận đặt phòng", "submitting": "Đang giữ phòng...", "terms": "Khi xác nhận, bạn đồng ý với chính sách đặt và hủy phòng của KaraGo.", "errorTitle": "Vui lòng kiểm tra lại thông tin", "createError": "Chưa thể tạo đặt phòng. Phòng có thể vừa được người khác chọn.", "validation": { "required": "Thông tin này là bắt buộc.", "invalidDate": "Vui lòng chọn ngày từ hôm nay trở đi.", "invalidPhone": "Nhập số điện thoại Việt Nam hợp lệ.", "invalidGuestCount": "Số khách vượt quá sức chứa của phòng.", "invalidDuration": "Thời lượng không hợp lệ với phòng này." } },
+  "confirmation": { "eyebrow": "Đã xác nhận", "title": "Phòng đã sẵn sàng cho bạn", "subtitle": "Chúng tôi đã giữ {{room}}. Hẹn gặp bạn tại {{venue}}!", "reference": "Mã đặt chỗ", "saveNote": "Hãy lưu mã này để tra cứu nhanh khi đến nơi.", "viewBookings": "Xem lịch đặt của tôi", "backHome": "Về trang chủ", "notFound": "Không tìm thấy thông tin xác nhận." },
+  "auth": { "welcomeBack": "Chào mừng trở lại", "loginSubtitle": "Đăng nhập để quản lý mọi buổi hát ở một nơi.", "createTitle": "Tạo tài khoản KaraGo", "registerSubtitle": "Lưu lịch đặt, nhận xác nhận và quay lại nhanh hơn.", "name": "Họ và tên", "email": "Email", "password": "Mật khẩu", "confirmPassword": "Nhập lại mật khẩu", "loginAction": "Đăng nhập", "registerAction": "Tạo tài khoản", "noAccount": "Chưa có tài khoản?", "hasAccount": "Đã có tài khoản?", "passwordHint": "Tối thiểu 6 ký tự", "passwordMismatch": "Mật khẩu chưa trùng khớp.", "genericError": "Chưa thể hoàn tất. Vui lòng thử lại." },
+  "bookings": { "eyebrow": "Tài khoản", "title": "Lịch đặt của tôi", "subtitle": "Mọi kế hoạch karaoke của bạn, gọn gàng trong một nơi.", "emptyTitle": "Chưa có lịch đặt nào", "emptyText": "Căn phòng đầu tiên của bạn chỉ cách vài lần chạm.", "exploreCta": "Khám phá phòng", "status": { "pending": "Chờ xác nhận", "confirmed": "Đã xác nhận", "completed": "Hoàn tất", "cancelled": "Đã hủy" }, "cancelAction": "Hủy đặt phòng", "cancelConfirm": "Bạn chắc chắn muốn hủy lịch đặt này?", "cancelledMessage": "Lịch đặt đã được hủy." },
+  "about": { "eyebrow": "Vì sao có KaraGo", "title": "Đêm vui nên bắt đầu từ sự háo hức, không phải hàng loạt cuộc gọi.", "story": "KaraGo giúp bạn tìm và đặt những phòng karaoke đáng tin cậy bằng một trải nghiệm đơn giản, đẹp và minh bạch.", "value1Title": "Được chọn lọc", "value1Text": "Mỗi địa điểm đều được xem xét về không gian, dịch vụ và độ tin cậy.", "value2Title": "Giá rõ ràng", "value2Text": "Biết số tiền dự kiến trước khi xác nhận — không có bất ngờ khó chịu.", "value3Title": "Đặt thật nhanh", "value3Text": "Giờ trống trực tiếp và xác nhận được lưu ngay sau khi đặt." },
+  "footer": { "tagline": "Tìm đúng phòng. Hát đúng chất. Giữ trọn cuộc vui.", "discover": "Khám phá", "account": "Tài khoản", "support": "Hỗ trợ", "help": "Trung tâm trợ giúp", "terms": "Điều khoản", "privacy": "Quyền riêng tư", "copyright": "© 2026 KaraGo. Được tạo nên cho những đêm đáng nhớ." },
+  "errors": { "genericTitle": "Có điều gì đó chưa ổn", "genericText": "Vui lòng tải lại hoặc thử lại sau ít phút.", "pageNotFound": "Trang bạn tìm không tồn tại.", "goHome": "Về trang chủ" }
 }

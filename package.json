@@ -1,5 +1,5 @@
 {
-  "name": "booking-nhanh",
+  "name": "karago-web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,17 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.0",
-    "antd": "^6.3.7",
-    "dayjs": "^1.11.13",
     "i18next": "^26.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-fast-marquee": "^1.6.5",
     "react-i18next": "^17.0.8",
-    "react-router-dom": "^7.15.1",
-    "swiper": "^12.1.4",
-    "tailwindcss": "^4.3.0"
+    "react-router-dom": "^7.15.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

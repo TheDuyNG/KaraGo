@@ -1,34 +1,18 @@
-import './App.css'
-import Footer from './components/footer/Footer'
-import Navbar from './components/navbar/Navbar'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { ThemeProvider } from './providers/ThemeProvider'
+import { AppShell } from './components/layout/AppShell'
 import HomePage from './pages/home/HomePage'
+import ExplorePage from './pages/ExplorePage'
+import RoomDetailsPage from './pages/RoomDetailsPage'
 import BookingPage from './pages/booking/BookingPage'
+import BookingConfirmationPage from './pages/BookingConfirmationPage'
+import AuthPage from './pages/AuthPage'
+import MyBookingsPage from './pages/MyBookingsPage'
 import AboutPage from './pages/about/AboutPage'
-import ServicesPage from './pages/services/ServicesPage'
-import Login from './pages/Login'
-import AdminPage from './pages/admin/AdminPage'
-import ProtectedRoute from './auth/ProtectedRoute'
-import Register from './pages/Register'
+import NotFoundPage from './pages/NotFoundPage'
 import './i18n'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import './styles/app.css'
 
-function App() {
-  return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<HomePage />} />
-        <Route path='/services' element={<ServicesPage />} />
-        <Route path='/about' element={<AboutPage />} />
-        <Route path='/booking' element={<BookingPage />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/admin/login' element={<Navigate to="/login" replace />} />
-        <Route path='/admin' element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
-      </Routes>
-      {/* <Footer /> */}
-    </Router>
-  )
+export default function App() {
+  return <ThemeProvider><BrowserRouter><Routes><Route element={<AppShell/>}><Route index element={<HomePage/>}/><Route path="explore" element={<ExplorePage/>}/><Route path="rooms/:roomId" element={<RoomDetailsPage/>}/><Route path="booking/:roomId" element={<BookingPage/>}/><Route path="booking-confirmation/:bookingId" element={<BookingConfirmationPage/>}/><Route path="bookings" element={<MyBookingsPage/>}/><Route path="about" element={<AboutPage/>}/><Route path="*" element={<NotFoundPage/>}/></Route><Route path="login" element={<AuthPage mode="login"/>}/><Route path="register" element={<AuthPage mode="register"/>}/></Routes></BrowserRouter></ThemeProvider>
 }
-
-export default App
