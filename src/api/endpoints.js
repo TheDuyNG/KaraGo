@@ -1,23 +1,28 @@
+const API_PREFIX = '/api'
+
 export const API_ENDPOINTS = Object.freeze({
   auth: {
-    login: '/auth/login',
-    register: '/auth/register',
-    me: '/auth/me',
+    login: `${API_PREFIX}/auth/login`,
+    register: `${API_PREFIX}/auth/register`,
+    me: `${API_PREFIX}/auth/me`,
+    refresh: `${API_PREFIX}/auth/refresh`,
+    logout: `${API_PREFIX}/auth/logout`,
+    changePassword: `${API_PREFIX}/auth/change-password`,
   },
   venues: {
-    list: '/venues',
-    details: (venueId) => `/venues/${venueId}`,
+    list: `${API_PREFIX}/venues`,
+    details: (venueId) => `${API_PREFIX}/venues/${venueId}`,
   },
   rooms: {
-    list: '/rooms',
-    details: (roomId) => `/rooms/${roomId}`,
-    availability: (roomId) => `/rooms/${roomId}/availability`,
+    list: `${API_PREFIX}/rooms`,
+    details: (roomId) => `${API_PREFIX}/rooms/${roomId}`,
+    availability: (roomId) => `${API_PREFIX}/rooms/${roomId}/availability`,
   },
   bookings: {
-    create: '/bookings',
-    details: (bookingId) => `/bookings/${bookingId}`,
-    mine: '/bookings/me',
-    cancel: (bookingId) => `/bookings/${bookingId}/cancel`,
+    create: `${API_PREFIX}/bookings`,
+    details: (bookingId) => `${API_PREFIX}/bookings/${bookingId}`,
+    mine: `${API_PREFIX}/bookings/me`,
+    cancel: (bookingId) => `${API_PREFIX}/bookings/${bookingId}/cancel`,
   },
-  users: { me: '/users/me' },
+  users: { me: `${API_PREFIX}/users/me` },
 })

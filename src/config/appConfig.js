@@ -6,7 +6,7 @@ const configuredTheme = import.meta.env.VITE_DEFAULT_THEME
 
 export const appConfig = Object.freeze({
   appName: import.meta.env.VITE_APP_NAME ?? 'KaraGo',
-  apiBaseUrl: (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api').replace(/\/$/, ''),
+  apiBaseUrl: (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000').replace(/\/+$/, ''),
   useMockApi: import.meta.env.VITE_USE_MOCK_API !== 'false',
   defaultLanguage: supportedLanguages.includes(configuredLanguage) ? configuredLanguage : 'vi',
   defaultTheme: supportedThemes.includes(configuredTheme) ? configuredTheme : 'dark',

@@ -9,7 +9,13 @@ npm install
 npm run dev
 ```
 
-The backend is not available yet, so development and production builds currently use the mock service layer. Copy `.env.example` when you need local overrides. Set `VITE_USE_MOCK_API=false` when connecting the proposed backend contract documented in `docs/api-contract.md`.
+Local development uses `http://localhost:5000` through the centralized `VITE_API_BASE_URL` setting. Set `VITE_USE_MOCK_API=true` in a local override only when the backend is unavailable.
+
+Production uses `https://api.dtech.io.vn`. Configure the following Vercel Production environment variable (the committed production file provides the same build-time default):
+
+```text
+VITE_API_BASE_URL=https://api.dtech.io.vn
+```
 
 ## Quality checks
 

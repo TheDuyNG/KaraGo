@@ -12,6 +12,21 @@ function persistSession(session) {
   return session
 }
 
+function persistUser(user) {
+  localStorage.setItem(storageKeys.user, JSON.stringify(user))
+  localStorage.setItem('user', JSON.stringify(user))
+  window.dispatchEvent(new Event('karago:auth-changed'))
+  return user
+}
+
+function clearSession() {
+  localStorage.removeItem(storageKeys.authToken)
+  localStorage.removeItem(storageKeys.user)
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  window.dispatchEvent(new Event('karago:auth-changed'))
+}
+
 const mockUser = (values) => ({
   id: 'user-demo', name: values.name ?? 'Minh Anh', email: values.email, role: 'customer',
 })
@@ -25,6 +40,11 @@ export const authService = {
     if (appConfig.useMockApi) return persistSession({ token: 'karago-mock-token', user: mockUser(values) })
     return persistSession(await apiClient.post(API_ENDPOINTS.auth.register, values))
   },
+  async getMe() {
+    if (appConfig.useMockApi) return this.getCurrentUser()
+    const response = await apiClient.get(API_ENDPOINTS.auth.me)
+    return persistUser(response.user ?? response)
+  },
   getCurrentUser() {
     try {
       return JSON.parse(localStorage.getItem(storageKeys.user) ?? localStorage.getItem('user'))
@@ -32,10 +52,15 @@ export const authService = {
       return null
     }
   },
-  logout() {
-    Object.values({ token: storageKeys.authToken, user: storageKeys.user }).forEach((key) => localStorage.removeItem(key))
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    window.dispatchEvent(new Event('karago:auth-changed'))
+  async logout() {
+    try {
+      if (!appConfig.useMockApi && this.getCurrentUser()) {
+        await apiClient.post(API_ENDPOINTS.auth.logout)
+      }
+    } catch {
+      // A failed revocation request must not leave the browser locally authenticated.
+    } finally {
+      clearSession()
+    }
   },
 }

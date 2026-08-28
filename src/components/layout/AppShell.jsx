@@ -34,9 +34,12 @@ export function AppShell() {
     localStorage.setItem(storageKeys.language, language)
   }
 
-  const handleLogout = () => {
-    authService.logout()
-    navigate('/')
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+    } finally {
+      navigate('/')
+    }
   }
 
   return <div className="app-shell">
